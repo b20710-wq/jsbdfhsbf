@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>내가 로판 소설에 빙의되었다?! - 성격 테스트</title>
+    <style>
+        /* 로판 감성의 화려하고 유치 달달한 핑크/보라 테마 스타일링 */
+        @import url('https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Hi+Melody&display=swap');
+
+        :root {
+            --primary-color: #ff7597;
+            --secondary-color: #9b5de5;
+            --gold-color: #ffd700;
+            --bg-gradient: linear-gradient(135deg, #ffe5ec 0%, #ffc2d1 50%, #e8dbfc 100%);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Gowun Batang', serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.85);
+            border: 4px double var(--gold-color);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1), inset 0 0 20px rgba(255, 215, 0, 0.2);
+            backdrop-filter: blur(5px);
+            position: relative;
+        }
+
+        /* 반짝이 효과 장식 */
+        .container::before, .container::after {
+            content: '✨';
+            position: absolute;
+            font-size: 24px;
+        }
+        .container::before { top: 10px; left: 15px; }
+        .container::after { bottom: 10px; right: 15px; }
+
+        h1 {
+            font-family: 'Hi Melody', cursive;
+            font-size: 2.5rem;
+            color: var(--secondary-color);
+            text-shadow: 2px 2px 0px #fff, 4px 4px 0px rgba(255, 117, 151, 0.3);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .card {
+            display: none;
+        }
+
+        .card.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background-color: #eee;
+            border-radius: 6px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: bold;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            word-break: keep-all;
+            color: #222;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: #ffffff;
+            border: 2px solid #ffccd5;
+            border-radius: 12px;
+            padding: 15px 20px;
+            font-family: 'Gowun Batang', serif;
+            font-size: 1rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .option-btn:hover {
+            background: linear-gradient(90deg, #fff0f3, #f3e8ff);
+            border-color: var(--primary-color);
+            transform: scale(1.02);
+            box-shadow: 0 0 12px rgba(255, 117, 151, 0.4);
+        }
+
+        /* 결과 창 스타일링 */
+        .result-title {
+            font-family: 'Hi Melody', cursive;
+            font-size: 2.8rem;
+            color: #ff1493;
+            margin: 20px 0 10px 0;
+            text-shadow: 2px 2px 0px var(--gold-color);
+        }
+
+        .result-img-box {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+            border: 5px dashed var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #fff;
+            font-size: 4rem; /* 일러스트 대신 귀여운 이모지로 대체 */
+            box-shadow: 0 0 20px rgba(155, 93, 229, 0.2);
+        }
+
+        .result-analysis {
+            text-align: left;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 5px solid var(--secondary-color);
+            margin: 20px 0;
+            line-height: 1.7;
+            word-break: keep-all;
+        }
+
+        .start-btn, .restart-btn {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: 2px solid var(--gold-color);
+            border-radius: 30px;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            transition: transform 0.2s;
+        }
+
+        .start-btn:hover, .restart-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 213, 0, 0.6);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="start-screen" class="card active">
+        <h1>내가 로판 소설에 빙의되었다?!</h1>
+        <p class="subtitle">"눈을 떠보니 내가 장미 왕국의 주인공?! 과연 나의 운명은..."</p>
+        <div style="font-size: 5rem; margin: 20px;">👑✨🌹</div>
+        <button class="start-btn" onclick="startTest()">빙의하러 가기</button>
+    </div>
+
+    <div id="test-screen" class="card">
+        <div class="progress-bar">
+            <div id="progress" class="progress"></div>
+        </div>
+        <div id="question-text" class="question-text">상황 질문이 들어갈 자리입니다.</div>
+        <div id="options" class="options-container">
+            </div>
+    </div>
+
+    <div id="result-screen" class="card">
+        <p style="font-size: 1.2rem; font-weight: bold; color: var(--secondary-color); margin-bottom: 0;">나의 전생 유형은?</p>
+        <div id="result-title" class="result-title">결과 타이틀</div>
+        <div id="result-img" class="result-img-box">👸</div>
+        <div id="result-analysis" class="result-analysis">결과 분석 내용이 들어갈 자리입니다.</div>
+        <button class="restart-btn" onclick="restartTest()">다시 빙의하기 🔄</button>
+    </div>
+</div>
+
+<script>
+    // 총 12개의 스토리형 문항 데이터 (선택지 5개 고정, 순서대로 1~5점 부여)
+    const questions = [
+        {
+            q: "눈을 떠보니 화려한 침대 위. 거울 속 내 모습은 절세미녀인데, 하녀가 나를 보며 벌벌 떨고 있다. 이때 나의 행동은?",
+            a: [
+                { text: "“저기... 내가 혹시 뭘 잘못했니...?” 조심스럽게 눈치를 본다.", score: 1 },
+                { text: "일단 상황 파악이 안 되니 조용히 침착하게 나갈 것을 명한다.", score: 2 },
+                { text: "‘내가 로판 속 악녀에 빙의했군!’ 상황을 즐기며 씨익 웃어준다.", score: 3 },
+                { text: "“거울 좀 더 가져와 봐.” 당당하게 요구하며 현재 신분부터 확인한다.", score: 4 },
+                { text: "“누구 마음대로 내 눈앞에서 떠는가?” 일단 기선제압부터 하고 본다.", score: 5 }
+            ]
+        },
+        {
+            q: "사교계 파티에 참석했는데, 원작의 여주인공이 나에게 다가와 고의로 드레스에 와인을 쏟았다! 나의 대처는?",
+            a: [
+                { text: "창피해서 얼른 화장실로 도망쳐서 눈물을 훔친다.", score: 1 },
+                { text: "“실수하신 거죠?”라며 억지 미소를 지으며 세탁비를 청구한다.", score: 2 },
+                { text: "똑같이 와인을 들고 와서 그 여주의 정수리에 부어버린다.", score: 3 },
+                { text: "주변 사람들에게 다 들리도록 조근조근 팩트로 영혼까지 털어버린다.", score: 4 },
+                { text: "“드레스가 주인을 알아보지 못했군.”하며 그 자리에서 드레스를 찢어 파격 패션으로 승화시킨다.", score: 5 }
+            ]
+        },
+        {
+            q: "치명적인 매력의 북부대공이 나에게 계약 결혼을 제안하며 “마음은 줄 수 없소”라고 차갑게 말한다. 나의 대답은?",
+            a: [
+                { text: "무서워서 거절하고 조용히 멀리 도망쳐 살 길을 찾는다.", score: 1 },
+                { text: "“돈과 안전만 보장된다면 상관없습니다”라며 철저한 비즈니스 계약서를 쓴다.", score: 2 },
+                { text: "“마음은 필요 없고, 그쪽 얼굴과 재산만 있으면 됩니다”라며 비웃어준다.", score: 3 },
+                { text: "“과연 끝까지 안 줄 수 있을까?” 도발적인 미소를 지어준다.", score: 4 },
+                { text: "“내 마음도 아까우니 꿈도 꾸지 마라. 얼른 서류에 도장이나 찍어라.” 주도권을 뺏어온다.", score: 5 }
+            ]
+        },
+        {
+            q: "황태자가 나를 두고 다른 영애와 바람을 피우는 현장을 목격했다. 어떻게 할 것인가?",
+            a: [
+                { text: "마음이 아프지만 소문이 날까 두려워 조용히 자리를 피한다.", score: 1 },
+                { text: "뒷조사를 시작해서 황태자의 약점을 잡을 증거를 수집한다.", score: 2 },
+                { text: "파혼 서류를 미리 작성해서 황제궁에 바로 투척해 버린다.", score: 3 },
+                { text: "그 자리에서 둘의 앞을 가로막고 사교계에 매장시키겠다고 경고한다.", score: 4 },
+                { text: "“황태자 자리가 주인을 바꿀 때가 되었군.” 척살령을 고민하며 황위를 찬탈할 계획을 세운다.", score: 5 }
+            ]
+        },
+        {
+            q: "마법 상점에 갔는데 신비로운 아기 드래곤이 나를 보고 주인이라며 따르기 시작했다. 이때 나의 반응은?",
+            a: [
+                { text: "“드래곤이라니 무서워..! 주인이 오기 전에 얼른 도망치자.”", score: 1 },
+                { text: "드래곤의 가치와 키우는 데 드는 비용을 머릿속으로 빠르게 계산해 본다.", score: 2 },
+                { text: "귀여우니까 일단 품에 안고 맛있는 간식부터 챙겨준다.", score: 3 },
+                { text: "이 드래곤을 이용해 내 가문의 세력을 어떻게 키울지 전략을 짠다.", score: 4 },
+                { text: "“좋아, 오늘부터 내 세계 정복의 첫 번째 동반자다.” 쿨하게 받아들인다.", score: 5 }
+            ]
+        },
+        {
+            q: "가문의 재정이 어려워져 빚쟁이들이 저택으로 들이닥쳐 행패를 부리고 있다. 당신의 해결책은?",
+            a: [
+                { text: "방 안에 숨어서 제발 이 상황이 조용히 지나가기만을 기도한다.", score: 1 },
+                { text: "내가 가진 현대 지식을 활용해 비누나 초콜릿 사업을 기획해 대박을 노린다.", score: 2 },
+                { text: "지나가던 엄청난 부자 공작에게 접근해 투자를 제안하는 승부수를 던진다.", score: 3 },
+                { text: "당당히 나가 법적 조항을 읊으며 빚쟁이들을 논리정연하게 쫓아낸다.", score: 4 },
+                { text: "“내 저택에서 무기를 꺼내든 대가는 목숨으로 치러야 할 것이다.” 기사단을 움직여 압도한다.", score: 5 }
+            ]
+        },
+        {
+            q: "원작의 남주인공이 치명적인 독에 중독되어 내 방 문 앞에 쓰러져 있다. 나의 선택은?",
+            a: [
+                { text: "연루되기 싫어서 모른 척 문을 닫고 경비병을 부른다.", score: 1 },
+                { text: "일단 살려두면 나중에 보상을 크게 해줄 것 같아 정성껏 치료해 준다.", score: 2 },
+                { text: "해독제를 주는 대신, 나에게 절대 복종하겠다는 서약서를 받아낸다.", score: 3 },
+                { text: "독의 성분을 분석해 누가 배후인지 알아내려 머리를 굴린다.", score: 4 },
+                { text: "“내 허락 없이 내 구역에서 죽을 순 없다.” 뺨을 때려서라도 깨운다.", score: 5 }
+            ]
+        },
+        {
+            q: "무도회에서 입을 드레스를 고르러 숍에 갔다. 디자이너가 추천하는 드레스 중 내 스타일은?",
+            a: [
+                { text: "눈에 띄지 않고 단아한 파스텔톤의 청순한 드레스", score: 1 },
+                { text: "요즘 사교계에서 가장 유행하는 세련되고 고급스러운 드레스", score: 2 },
+                { text: "활동하기 편하면서도 은근히 돈 많아 보이는 실속형 드레스", score: 3 },
+                { text: "화려한 레이스와 보석이 박혀 모두의 시선을 싹쓸이하는 드레스", score: 4 },
+                { text: "핏빛처럼 붉거나 칠흑처럼 어두운, 압도적인 아우라의 여왕풍 드레스", score: 5 }
+            ]
+        },
+        {
+            q: "황실 기사단장이 나에게 무례한 언행을 하며 나의 가문을 모욕했다. 이때 나의 대처는?",
+            a: [
+                { text: "기사단장의 위세가 무서워 고개를 숙이고 사과를 받아내지 못한다.", score: 1 },
+                { text: "사교계에 소문을 퍼뜨려 그의 평판을 바닥으로 떨어뜨린다.", score: 2 },
+                { text: "그가 저지른 비리 장부를 입수해 황제에게 고발한다.", score: 3 },
+                { text: "그 자리에서 뺨을 올려붙이며 “어디 감히 가문을 논하느냐”며 소리친다.", score: 4 },
+                { text: "그의 목에 직접 검을 겨누며 “내 칼이 네 목을 지나가도 그 오만이 유지될까?”라며 비웃는다.", score: 5 }
+            ]
+        },
+        {
+            q: "신비한 숲을 걷다가 소원을 들어주는 요정을 만났다. 내가 빌고 싶은 소원은?",
+            a: [
+                { text: "아무도 나를 괴롭히지 않는 평화롭고 안전한 삶", score: 1 },
+                { text: "평생 다 쓰지도 못할 만큼의 엄청난 황금과 재화", score: 2 },
+                { text: "사교계를 내 뜻대로 쥐락팎할 수 있는 치명적인 매력과 말빨", score: 3 },
+                { text: "제국에서 가장 강력하고 똑똑한 천재적인 두뇌와 마법 능력", score: 4 },
+                { text: "누구도 거역할 수 없는 절대적인 권력과 여황제의 자리", score: 5 }
+            ]
+        },
+        {
+            q: "누군가 나를 모함하여 황실 재판에 피고인으로 서게 되었다. 관중들이 수군거릴 때 나의 태도는?",
+            a: [
+                { text: "너무 억울하고 무서워서 눈물을 흘리며 결백을 주장한다.", score: 1 },
+                { text: "준비해 둔 증인과 알리바이를 하나씩 제시하며 차분하게 반박한다.", score: 2 },
+                { text: "어차피 이 판은 짰으니 법정을 비웃으며 당당하게 짝다리를 짚는다.", score: 3 },
+                { text: "재판관의 논리적 모순을 조목조목 지적하며 법정의 분위기를 내 쪽으로 가져온다.", score: 4 },
+                { text: "“감히 누가 누구를 심판하려 드는가?” 법정 문을 부수고 들어오는 내 기사단을 보며 미소 짓는다.", score: 5 }
+            ]
+        },
+        {
+            q: "모든 사건이 해결되고 마침내 평화가 찾아왔다. 당신이 선택할 마지막 엔딩의 모습은?",
+            a: [
+                { text: "조용한 시골 영지에서 좋아하는 꽃을 가꾸며 사는 유유자적 엔딩", score: 1 },
+                { text: "대륙 최대의 상단을 차려 전 세계의 돈을 쓸어 담는 부자 엔딩", score: 2 },
+                { text: "사교계의 절대적인 지배자가 되어 매일 화려한 파티를 여는 주인공 엔딩", score: 3 },
+                { text: "집착 가득한 남주인공들의 사랑을 한 몸에 받으며 즐기는 로맨스 엔딩", score: 4 },
+                { text: "스스로 황제의 자리에 올라 제국을 호령하고 역사에 이름을 남기는 여황제 엔딩", score: 5 }
+            ]
+        }
+    ];
+
+    // 결과 데이터 정의 (구간별 점수 매칭)
+    const results = [
+        {
+            min: 12, max: 24,
+            title: "평화로운 숲속의 힐러! 생존력 100% 성녀",
+            emoji: "🧝‍♀️",
+            desc: "<b>성격 분석:</b> 당신은 귀찮은 싸움과 권력 구도에 엮이는 것을 정말 싫어하는 평화주의자입니다. 소심해 보일 수 있지만, 위기 상황에서는 남들을 구하는 따뜻하고 단단한 내면을 가졌군요!<br><br><b>어울리는 삶:</b> 치열한 사교계 정치 싸움을 떠나, 신비로운 숲속 영지에서 힐링 물약을 만들며 조용히 사는 삶이 딱입니다. 하지만 당신의 맑고 순수한 능력 때문에 숨어 살아도 남주들이 자꾸 찾아와 집착할 운명이니 조심하세요!"
+        },
+        {
+            min: 25, max: 36,
+            title: "돈 많은 게 최고야! 갓생 사는 대상단주",
+            emoji: "💰",
+            desc: "<b>성격 분석:</b> 사랑이니 명예니 하는 것보다 내 통장의 잔고가 가장 중요한 현실주의자이자 실속파입니다. 비상한 두뇌와 계산 능력으로 손해 보는 장사는 절대 하지 않는 스타일!<br><br><b>어울리는 삶:</b> 현대 지식을 백분 활용해 사교계에 디저트나 뷰티 열풍을 일으키며 대륙 최고의 상단을 차릴 인물입니다. 황태자가 찾아와도 '바쁘니까 비즈니스 얘기 아니면 나가달라'고 쿨하게 문을 닫아버리는 멋진 갓생을 살게 될 것입니다."
+        },
+        {
+            min: 37, max: 48,
+            title: "빛나는 사교계의 꽃! 치명타 200% 공작영애",
+            emoji: "🌹",
+            desc: "<b>성격 분석:</b> 화려한 말빨과 수려한 외모, 그리고 뛰어난 지략으로 사람들의 마음을 쥐락펴락하는 타고난 사교계의 지배자입니다. 나를 모함하려는 악역들은 당신의 여우 같은 말 한마디에 알아서 자폭하게 됩니다.<br><br><b>어울리는 삶:</b> 무도회장의 화려한 조명 아래에서 모든 영애들의 워너비, 모든 공작들의 짝사랑 상대로 군림하는 삶이 어울립니다. 사이다 같은 팩트 폭격으로 고구마 상황을 완벽하게 진압하는 화려한 주인공의 삶을 즐기세요!"
+        },
+        {
+            min: 49, max: 60,
+            title: "Queen never cry! 퀸력 100% 여황제",
+            emoji: "👑",
+            desc: "<b>성격 분석:</b> 태생부터 지배자의 피가 흐르는 압도적 카리스마의 소유자입니다! 어떤 위기 상황에서도 결코 눈물을 흘리지 않으며, 내 앞길을 막는 자는 남주든 악역이든 가리지 않고 밟고 지나가는 걸크러시 대마왕입니다.<br><br><b>어울리는 삶:</b> 누군가의 아내나 영애로 남기엔 그릇이 너무 큽니다. 차라리 반역을 일으키거나 스스로 황위에 올라 제국을 다스리는 지배자의 삶이 완벽합니다. 대륙 최고의 기사들과 북부대공마저 당신의 발치에 무릎을 꿇고 충성을 맹세할 것입니다."
+        }
+    ];
+
+    let currentIdx = 0;
+    let totalScore = 0;
+
+    function startTest() {
+        document.getElementById("start-screen").classList.remove("active");
+        document.getElementById("test-screen").classList.add("active");
+        showQuestion();
+    }
+
+    function showQuestion() {
+        if(currentIdx >= questions.length) {
+            showResult();
+            return;
+        }
+
+        // 진행바 업데이트
+        const percent = (currentIdx / questions.length) * 100;
+        document.getElementById("progress").style.width = percent + "%";
+
+        // 질문 세팅
+        const currentQ = questions[currentIdx];
+        document.getElementById("question-text").innerText = `Q${currentIdx + 1}. ${currentQ.q}`;
+
+        // 선택지 세팅 (5개 고정)
+        const optionsDiv = document.getElementById("options");
+        optionsDiv.innerHTML = ""; // 기존 버튼 초기화
+
+        currentQ.a.forEach(answer => {
+            const button = document.createElement("button");
+            button.className = "option-btn";
+            button.innerText = answer.text;
+            button.onclick = () => {
+                totalScore += answer.score;
+                currentIdx++;
+                showQuestion();
+            };
+            optionsDiv.appendChild(button);
+        });
+    }
+
+    function showResult() {
+        document.getElementById("test-screen").classList.remove("active");
+        document.getElementById("result-screen").classList.add("active");
+
+        // 점수 구간에 맞는 결과 찾기
+        let finalResult = results[results.length - 1]; // 기본값 최고 점수
+        for(let i=0; i<results.length; i++) {
+            if(totalScore >= results[i].min && totalScore <= results[i].max) {
+                finalResult = results[i];
+                break;
+            }
+        }
+
+        // 결과 화면에 데이터 매칭
+        document.getElementById("result-title").innerHTML = finalResult.title;
+        document.getElementById("result-img").innerText = finalResult.emoji;
+        document.getElementById("result-analysis").innerHTML = `<b>누적 점수: ${totalScore}점</b><br><br>${finalResult.desc}`;
+    }
+
+    function restartTest() {
+        currentIdx = 0;
+        totalScore = 0;
+        document.getElementById("result-screen").classList.remove("active");
+        document.getElementById("start-screen").classList.add("active");
+    }
+</script>
+
+</body>
+</html>
